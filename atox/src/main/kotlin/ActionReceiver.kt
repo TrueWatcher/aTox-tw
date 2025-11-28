@@ -127,26 +127,14 @@ class ActionReceiver : BroadcastReceiver() {
 
         if (callManager.inCall.value is CallState.InCall) {
             withContext(Dispatchers.Main) {
-                Toast.makeText(context, context.getString(R.string.error_simultaneous_calls), Toast.LENGTH_LONG).show()
+                Toast
+                    .makeText(context, context.getString(R.string.error_simultaneous_calls), Toast.LENGTH_LONG)
+                    .show()
                 notificationHelper.showPendingCallNotification(UserStatus.Busy, contact)
             }
             return
         }
-
-        try {
-            callManager.startCall(pk)
-            notificationHelper.showOngoingCallNotification(contact)
-        } catch (e: ToxavAnswerException) {
-            Log.e(TAG, e.toString())
-            return
-        }
-
-        val isSendingAudio = context.hasPermission(Manifest.permission.RECORD_AUDIO) && callManager.startSendingAudio()
-        if (!isSendingAudio) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, R.string.call_mic_permission_needed, Toast.LENGTH_LONG).show()
-            }
-        }
+        // removed code, duplicated in CallFragment
 
         // show the call screen
         val pendingIntent = deepLinkToCall(context, pk)
