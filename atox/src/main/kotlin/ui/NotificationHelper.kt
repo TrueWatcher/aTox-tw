@@ -315,7 +315,8 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         // Log.d(TAG, "showPendingCallNotificatio here")
         val notificationBuilder = NotificationCompat.Builder(context, CALL)
 
-        val pendingIntent = deepLinkToChat(PublicKey(c.publicKey))
+        // make notification to stay if it's tapped accidentally
+        val pendingIntent = nullIntent()
         if (context.hasPermission(Manifest.permission.USE_FULL_SCREEN_INTENT)) {
             // making the notification persistent takes a Full-screen intent
             notificationBuilder
@@ -384,14 +385,25 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         notifier.notify(c.publicKey.hashCode() + CALL.hashCode(), notification)
     }
 
-    private fun deepLinkToChat(publicKey: PublicKey, focusMessageBox: Boolean = false) = NavDeepLinkBuilder(context)
-        .setGraph(R.navigation.nav_graph)
-        .setDestination(R.id.chatFragment)
-        .setArguments(
-            bundleOf(
-                CONTACT_PUBLIC_KEY to publicKey.string(),
-                FOCUS_ON_MESSAGE_BOX to focusMessageBox,
-            ),
+    private fun deepLinkToChat(publicKey: PublicKey, focusMessageBox: Boolean = false) =
+        NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.chatFragment)
+            .setArguments(
+                bundleOf(
+                    CONTACT_PUBLIC_KEY to publicKey.string(),
+                    FOCUS_ON_MESSAGE_BOX to focusMessageBox,
+                ),
+            )
+            .createPendingIntent()
+
+    private fun nullIntent() : PendingIntent {
+        val doNothingIntent = Intent()
+        return PendingIntent.getBroadcast(
+            context,
+            0,
+            doNothingIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        .createPendingIntent()
+    }
 }
