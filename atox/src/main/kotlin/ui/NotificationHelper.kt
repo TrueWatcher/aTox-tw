@@ -385,25 +385,24 @@ class NotificationHelper @Inject constructor(private val context: Context) {
         notifier.notify(c.publicKey.hashCode() + CALL.hashCode(), notification)
     }
 
-    private fun deepLinkToChat(publicKey: PublicKey, focusMessageBox: Boolean = false) =
-        NavDeepLinkBuilder(context)
-            .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.chatFragment)
-            .setArguments(
-                bundleOf(
-                    CONTACT_PUBLIC_KEY to publicKey.string(),
-                    FOCUS_ON_MESSAGE_BOX to focusMessageBox,
-                ),
-            )
-            .createPendingIntent()
+    private fun deepLinkToChat(publicKey: PublicKey, focusMessageBox: Boolean = false) = NavDeepLinkBuilder(context)
+        .setGraph(R.navigation.nav_graph)
+        .setDestination(R.id.chatFragment)
+        .setArguments(
+            bundleOf(
+                CONTACT_PUBLIC_KEY to publicKey.string(),
+                FOCUS_ON_MESSAGE_BOX to focusMessageBox,
+            ),
+        )
+        .createPendingIntent()
 
-    private fun nullIntent() : PendingIntent {
+    private fun nullIntent(): PendingIntent {
         val doNothingIntent = Intent()
         return PendingIntent.getBroadcast(
             context,
             0,
             doNothingIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
 }

@@ -150,19 +150,19 @@ class ActionReceiver : BroadcastReceiver() {
 
         // show the call screen
         val pendingIntent = deepLinkToCall(context, pk)
-        try { pendingIntent.send()
+        try {
+            pendingIntent.send()
         } catch (e: PendingIntent.CanceledException) {
             e.printStackTrace()
         }
     }
-    private fun deepLinkToCall(context: Context, publicKey: PublicKey) =
-        NavDeepLinkBuilder(context)
-            .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.callFragment)
-            .setArguments(
-                bundleOf(
-                    CONTACT_PUBLIC_KEY to publicKey.string()
-                ),
-            )
-            .createPendingIntent()
+    private fun deepLinkToCall(context: Context, publicKey: PublicKey) = NavDeepLinkBuilder(context)
+        .setGraph(R.navigation.nav_graph)
+        .setDestination(R.id.callFragment)
+        .setArguments(
+            bundleOf(
+                CONTACT_PUBLIC_KEY to publicKey.string(),
+            ),
+        )
+        .createPendingIntent()
 }
