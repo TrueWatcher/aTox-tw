@@ -6,6 +6,7 @@
 package ltd.evilcorp.atox
 
 import android.Manifest
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -13,6 +14,8 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.RemoteInput
 import androidx.core.content.IntentCompat
+import androidx.core.os.bundleOf
+import androidx.navigation.NavDeepLinkBuilder
 import im.tox.tox4j.av.exceptions.ToxavAnswerException
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +24,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ltd.evilcorp.atox.ui.NotificationHelper
+import ltd.evilcorp.atox.ui.chat.CONTACT_PUBLIC_KEY
 import ltd.evilcorp.core.repository.ContactRepository
 import ltd.evilcorp.core.vo.Contact
 import ltd.evilcorp.core.vo.PublicKey
@@ -123,25 +127,30 @@ class ActionReceiver : BroadcastReceiver() {
 
         if (callManager.inCall.value is CallState.InCall) {
             withContext(Dispatchers.Main) {
-                Toast.makeText(context, context.getString(R.string.error_simultaneous_calls), Toast.LENGTH_LONG).show()
+                Toast
+                    .makeText(context, context.getString(R.string.error_simultaneous_calls), Toast.LENGTH_LONG)
+                    .show()
                 notificationHelper.showPendingCallNotification(UserStatus.Busy, contact)
             }
             return
         }
+        // removed code, duplicated in CallFragment
 
-        try {
-            callManager.startCall(pk)
-            notificationHelper.showOngoingCallNotification(contact)
-        } catch (e: ToxavAnswerException) {
-            Log.e(TAG, e.toString())
-            return
-        }
-
-        val isSendingAudio = context.hasPermission(Manifest.permission.RECORD_AUDIO) && callManager.startSendingAudio()
-        if (!isSendingAudio) {
-            withContext(Dispatchers.Main) {
-                Toast.makeText(context, R.string.call_mic_permission_needed, Toast.LENGTH_LONG).show()
-            }
+        // show the call screen
+        val pendingIntent = deepLinkToCall(context, pk)
+        try { pendingIntent.send()
+        } catch (e: PendingIntent.CanceledException) {
+            Log.e(TAG, "PendingIntent.CanceledException: ${e.toString()}}")
         }
     }
+    private fun deepLinkToCall(context: Context, publicKey: PublicKey) =
+        NavDeepLinkBuilder(context)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.callFragment)
+            .setArguments(
+                bundleOf(
+                    CONTACT_PUBLIC_KEY to publicKey.string()
+                ),
+            )
+            .createPendingIntent()
 }

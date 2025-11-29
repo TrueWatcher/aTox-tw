@@ -91,10 +91,10 @@ class Settings @Inject constructor(private val ctx: Context) {
         set(disable) = preferences.edit { putBoolean("disable_screenshots", disable) }
 
     var confirmQuitting: Boolean
-        get() = preferences.getBoolean("confirm_quitting", true)
+        get() = preferences.getBoolean("confirm_quitting", false)
         set(confirm) = preferences.edit { putBoolean("confirm_quitting", confirm) }
 
     var confirmCalling: Boolean
-        get() = preferences.getBoolean("confirm_calling", true)
+        get() = preferences.getBoolean("confirm_calling", false)
         set(confirm) = preferences.edit { putBoolean("confirm_calling", confirm) }
 }

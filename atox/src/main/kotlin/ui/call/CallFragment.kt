@@ -9,6 +9,7 @@ import android.Manifest
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+
 import android.os.SystemClock
 import android.util.Log
 import android.view.View
@@ -36,7 +37,6 @@ import ltd.evilcorp.domain.feature.CallState
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-
 private const val PERMISSION = Manifest.permission.RECORD_AUDIO
 private const val TAG = "CallFragment"
 
@@ -51,7 +51,7 @@ class CallFragment : BaseFragment<FragmentCallBinding>(FragmentCallBinding::infl
             updateMicrophoneControlIcon()
         } else {
             Log.d(TAG, "Got no permission")
-            Toast.makeText(requireContext(), getString(R.string.call_mic_permission_needed), Toast.LENGTH_LONG).show()
+            //Toast.makeText(requireContext(), getString(R.string.call_mic_permission_needed), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -85,12 +85,11 @@ class CallFragment : BaseFragment<FragmentCallBinding>(FragmentCallBinding::infl
         microphoneControl.setOnClickListener {
             if (! requireContext().hasPermission(PERMISSION)) {
                 vm.micOn = false
-                /*Toast.makeText(
+                Toast.makeText(
                     context,
                     R.string.call_mic_permission_needed,
                     Toast.LENGTH_LONG
-                ).show()*/
-                requestPermissionLauncher.launch(PERMISSION)
+                ).show()
             } else {
                 vm.toggleMicrophoneControl()
             }
@@ -119,6 +118,10 @@ class CallFragment : BaseFragment<FragmentCallBinding>(FragmentCallBinding::infl
        }
         binding.tvState.setText("startinng a call...") // normally, not to be seen
         vm.startCall()
+
+        if (! requireContext().hasPermission(PERMISSION)) {
+            requestPermissionLauncher.launch(PERMISSION)
+        }
     }// end onViewCreated
 
     /*override fun onResume() = binding.run {

@@ -41,7 +41,10 @@ class CallViewModel @Inject constructor(
 
     fun startCall() {
         callManager.startCall(publicKey)
-        scope.launch { notificationHelper.showOngoingCallNotification(contactManager.get(publicKey).first()) }
+        scope.launch {
+            notificationHelper.showOngoingCallNotification(
+                contactManager.get(publicKey).first())
+        }
     }
 
     fun endCall() = scope.launch {
