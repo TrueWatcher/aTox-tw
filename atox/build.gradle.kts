@@ -26,6 +26,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles("proguard-tox4j.pro", getDefaultProguardFile("proguard-android-optimize.txt"))
+            applicationIdSuffix = ".tw"
         }
     }
     signingConfigs {
