@@ -312,11 +312,13 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             return
         }
 
+        // Log.d(TAG, "showPendingCallNotificatio here")
         val notificationBuilder = NotificationCompat.Builder(context, CALL)
 
-        val pendingIntent = deepLinkToChat(PublicKey(c.publicKey))
+        // make notification to stay if it's tapped accidentally
+        val pendingIntent = nullIntent()
         if (context.hasPermission(Manifest.permission.USE_FULL_SCREEN_INTENT)) {
-            // Making the notification persistent takes a full-screen intent.
+            // making the notification persistent takes a Full-screen intent
             notificationBuilder
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setFullScreenIntent(pendingIntent, true)
@@ -324,7 +326,7 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             notificationBuilder.setContentIntent(pendingIntent)
         }
 
-        val notification = notificationBuilder
+        notificationBuilder
             .setCategory(NotificationCompat.CATEGORY_CALL)
             .setSmallIcon(android.R.drawable.ic_menu_call)
             .setContentTitle(context.getString(R.string.incoming_call))
@@ -374,10 +376,11 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             )
             .setSound(RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.TYPE_RINGTONE))
             .setSilent(status == UserStatus.Busy)
-            .build()
-            .apply {
-                flags = flags.or(NotificationCompat.FLAG_INSISTENT)
-            }
+
+        val notification = notificationBuilder.build()
+        notification.apply {
+            flags = flags.or(NotificationCompat.FLAG_INSISTENT)
+        }
 
         notifier.notify(c.publicKey.hashCode() + CALL.hashCode(), notification)
     }
@@ -392,4 +395,14 @@ class NotificationHelper @Inject constructor(private val context: Context) {
             ),
         )
         .createPendingIntent()
+
+    private fun nullIntent(): PendingIntent {
+        val doNothingIntent = Intent()
+        return PendingIntent.getBroadcast(
+            context,
+            0,
+            doNothingIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
 }
